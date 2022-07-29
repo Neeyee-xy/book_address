@@ -44,7 +44,7 @@ $reader->setReadFilter($filterRow);
    unset($data[0]);
     unset($data_control[0]);
    // unset($data[1]);
-  // var_dump($data);
+
 
    $qry="SELECT * from family ";
 		$sta=$connect->prepare($qry);
@@ -78,15 +78,16 @@ foreach ($data as $row1) {
  $key[]=$row1[13];
 }
 
-
+  // var_dump($email);
+  // var_dump($email_data);
 $check_diff=array_diff($email, $email_data);
+
 foreach ($check_diff as $key => $value) {
 	$key_in=$key+1;
 
 unset($data[$key_in]);
 
 }
-
 foreach ($data as $key => $value) {
 	// code...
 	$data_key[]=$key;
@@ -197,7 +198,7 @@ $response = array(
               );
 			break;
 		}else{
- $upload_address=$upload->upload_family_table($data_control[$key][0],$data_control[$key][1],$dob,$data_control[$key][3],$data_control[$key][4],$data_control[$key][5],$data_control[$key][6],$data_control[$key][7],$data_control[$key][8],$data_control[$key][9],$data_control[$key][10],$data_control[$key][11],$data_control[$key][12],$dob_year,$data_control[$key][13],$connect);
+ $upload_address=$upload->upload_family_table(clean($data_control[$key][0]),clean($data_control[$key][1]),clean($dob),clean($data_control[$key][3]),clean($data_control[$key][4]),clean($data_control[$key][5]),clean($data_control[$key][6]),clean($data_control[$key][7]),clean($data_control[$key][8]),clean($data_control[$key][9]),clean($data_control[$key][10]),clean($data_control[$key][11]),clean($data_control[$key][12]),clean($dob_year),clean($data_control[$key][13]),$connect);
 			          
 
 			           if ($upload_address=="Okay1")   {
@@ -356,7 +357,7 @@ $response = array(
               );
 			break;
 		}else{
-			            $upload_address=$upload->upload_family_table($data[$i][0],$data[$i][1],$dob,$data[$i][3],$data[$i][4],$data[$i][5],$data[$i][6],$data[$i][7],$data[$i][8],$data[$i][9],$data[$i][10],$data[$i][11],$data[$i][12],$dob_year,$data[$i][13],$connect);
+			            $upload_address=$upload->upload_family_table(clean($data[$i][0]),clean($data[$i][1]),clean($dob),clean($data[$i][3]),clean($data[$i][4]),clean($data[$i][5]),clean($data[$i][6]),clean($data[$i][7]),clean($data[$i][8]),clean($data[$i][9]),clean($data[$i][10]),clean($data[$i][11]),clean($data[$i][12]),clean($dob_year),clean($data[$i][13]),$connect);
 
          if ($upload_address=="Okay1")   {
 
@@ -391,7 +392,16 @@ $response = array(
                 "message" => $upload->set_msg_type_and_msg('select an csv file')
                 );
 }
+function clean($details){
+      $details=trim($details);
+      $details=stripcslashes($details);
+      $details=htmlspecialchars($details);
+      $details=ucwords($details);
+       return $details;
 
+
+
+}
 ?>
 <!DOCTYPE html>
 <html>
