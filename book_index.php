@@ -1,10 +1,6 @@
 <?php
 include('conn_book.php');
 $list_family_unit = new DB_con();
-
- 
-
-
 if (isset($_GET['end'])) {
 
  $end=clean($_GET['end']);
