@@ -155,7 +155,7 @@ $response = array(
                 );
 			break;
 		}else{
-			          $upload_address=$upload->upload_csv_file($data[$i][0],$data[$i][1],$dob,$data[$i][3],$data[$i][4],$data[$i][5],$data[$i][6],$data[$i][7],$data[$i][8],$data[$i][9],$data[$i][10],$data[$i][11],$data[$i][12],$dob_year,'1',$connect);
+			          $upload_address=$upload->upload_csv_file(clean($data[$i][0]),clean($data[$i][1]),clean($dob),clean($data[$i][3]),clean($data[$i][4]),clean($data[$i][5]),clean($data[$i][6]),clean($data[$i][7]),clean($data[$i][8]),clean($data[$i][9]),clean($data[$i][10]),clean($data[$i][11]),clean($data[$i][12]),clean($dob_year),'1',$connect);
 
          if ($upload_address=="Okay")   {
 
@@ -188,7 +188,16 @@ $response = array(
                 "message" => $upload->set_msg_type_and_msg('select an csv file')
                 );
 }
+function clean($details){
+      $details=trim($details);
+      $details=stripcslashes($details);
+      $details=htmlspecialchars($details);
+      $details=ucwords($details);
+       return $details;
 
+
+
+}
 ?>
 <!DOCTYPE html>
 <html>
