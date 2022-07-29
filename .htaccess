@@ -1,0 +1,18 @@
+Options +FollowSymLinks -MultiViews
+# Turn mod_rewrite on
+RewriteEngine On
+RewriteBase /
+DirectoryIndex book_index.php  
+
+
+
+
+
+
+
+
+
+
+
+
+
