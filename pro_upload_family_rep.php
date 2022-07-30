@@ -147,6 +147,17 @@ for ($i=1; $i <$count ; $i++) {
  
 	 	$brk_year=explode("-",$dob);
 	$dob_year=$brk_year[0];
+$upload_address_check_email=$upload->check_data_exist_family_rep($connect,$data[$i][11]);
+if ($check_for_empty) {
+	// code...
+	break;
+}
+
+if ($upload_address_check_email) {
+	// code...
+	break;
+}
+}
 	
 
 	
@@ -159,7 +170,7 @@ for ($i=1; $i <$count ; $i++) {
                 "message" => $upload->set_msg_type_and_msg('Empty value in column '.check_colume($check_for_empty).' row '.$row.' ')
                 );
 		// var_dump($check_for_empty);
-		break;
+		
 		
 	}else{
 		// var_dump($check_date);
@@ -172,7 +183,7 @@ for ($i=1; $i <$count ; $i++) {
 // 			break;
 // 		}else{
 
-			$upload_address_check_email=$upload->check_data_exist_family_rep($connect,$data[$i][11]);
+			
 
 			if ($upload_address_check_email==true) {
 			// code...
@@ -180,9 +191,32 @@ $response = array(
                 "type" => $upload->set_msg_type_and_msg('error'),
                 "message" => $upload->set_msg_type_and_msg('Date value in column L row '.$row.' Already exist on the database,it contains "'.$data[$i][11].' "')
               );
-			break;
+			
 		}else{
+			          
+
+for ($i=1; $i <$count ; $i++) { 
+	 $row=$i+1;
+	
+	// var_dump($error_trap);
+	// var_dump($check_for_empty);
+	// echo$check_for_empty;
+	$check_date=strstr($data[$i][2],'/');
+
+
+
+ if ($check_date!==false) {
+ $date = str_replace('/', '-', $data[$i][2]);
+	 $dob= date("Y-m-d", strtotime( $date));
+
+ }else{
+ 	$dob= date("Y-m-d", strtotime( $data[$i][2]));
+ }
+ 
+	 	$brk_year=explode("-",$dob);
+	$dob_year=$brk_year[0];
 			          $upload_address=$upload->upload_csv_existing_family_rep(clean($data[$i][0]),clean($data[$i][1]),clean($dob),clean($data[$i][3]),clean($data[$i][4]),clean($data[$i][5]),clean($data[$i][6]),clean($data[$i][7]),clean($data[$i][8]),clean($data[$i][9]),clean($data[$i][10]),clean($data[$i][11]),clean($data[$i][12]),clean($dob_year),'1',clean($data[$i][13]),$connect);
+			      }
 
          if ($upload_address=="Okay")   {
 
@@ -201,7 +235,7 @@ $response = array(
 		
 
 
-	}
+	
 	
 
 }

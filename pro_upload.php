@@ -132,8 +132,12 @@ for ($i=1; $i <$count ; $i++) {
  	$dob= date("Y-m-d", strtotime( $data[$i][2]));
  }
  
-	 	$brk_year=explode("-",$dob);
-	$dob_year=$brk_year[0];
+	if ($check_for_empty) {
+		// code...
+		break;
+	}
+ }
+	 	
 
 	
 	if ($check_for_empty!==false) {
@@ -143,7 +147,7 @@ for ($i=1; $i <$count ; $i++) {
                 "message" => $upload->set_msg_type_and_msg('Empty value in column '.check_colume($check_for_empty).' row '.$row.' ')
                 );
 		// var_dump($check_for_empty);
-		break;
+		
 		
 	}else{
 		// var_dump($check_date);
@@ -153,9 +157,33 @@ $response = array(
                 "type" => $upload->set_msg_type_and_msg('error'),
                 "message" => $upload->set_msg_type_and_msg('Date value in column C row '.$row.' is not well formed,it contains '.$data[$i][2].' ,acceptable format(mm/dd/yy) ')
                 );
-			break;
+			
 		}else{
-			          $upload_address=$upload->upload_csv_file(clean($data[$i][0]),clean($data[$i][1]),clean($dob),clean($data[$i][3]),clean($data[$i][4]),clean($data[$i][5]),clean($data[$i][6]),clean($data[$i][7]),clean($data[$i][8]),clean($data[$i][9]),clean($data[$i][10]),clean($data[$i][11]),clean($data[$i][12]),clean($dob_year),'1',$connect);
+
+
+
+for ($i=1; $i <$count ; $i++) { 
+	 $row=$i+1;
+	
+
+	$check_date=strstr($data[$i][2],'/');
+
+
+
+ if ($check_date!==false) {
+ $date = str_replace('/', '-', $data[$i][2]);
+	 $dob= date("Y-m-d", strtotime( $date));
+
+ }else{
+ 	$dob= date("Y-m-d", strtotime( $data[$i][2]));
+ }
+
+$brk_year=explode("-",$dob);
+	$dob_year=$brk_year[0];
+ $upload_address=$upload->upload_csv_file(clean($data[$i][0]),clean($data[$i][1]),clean($dob),clean($data[$i][3]),clean($data[$i][4]),clean($data[$i][5]),clean($data[$i][6]),clean($data[$i][7]),clean($data[$i][8]),clean($data[$i][9]),clean($data[$i][10]),clean($data[$i][11]),clean($data[$i][12]),clean($dob_year),'1',$connect);
+ }
+
+			          
 
          if ($upload_address=="Okay")   {
 
@@ -177,7 +205,7 @@ $response = array(
 	}
 	
 
-}
+
 
 
 
