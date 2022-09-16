@@ -17,6 +17,7 @@ $uid=clean($_POST["uid"]);
                 );
 
     
+
         }
         else{
           $firstname=clean($_POST["firstname"]);
@@ -186,7 +187,13 @@ $uid=clean($_POST["uid"]);
             $country=clean($_POST["country"]);
           }
 
-
+if ($family_unit==$uid and $fam =="Yes") {
+   // code...
+   $response = array(
+                "type" => $update_family->set_msg_type_and_msg('error'),
+                "message" => $update_family->set_msg_type_and_msg('You can\'t make an individual the family rep of himself or herself,select NO instead ')
+                );
+}else{
 $check_family_rep=$update_family->check_family_if_family_rep_exist($connect,$uid);
 
 if ($check_family_rep==true) {
@@ -195,7 +202,7 @@ if ($check_family_rep==true) {
                 "message" => $update_family->set_msg_type_and_msg('Can\'t assign individual, Individual is a family rep with family members assigned to them. De-assign the family members first')
                 );
 }else{
-    $test_update_family=$update_family->update_address($firstname,$lastname,$dob,$gender,$street,$house_number,$zip_code,$city,$country,$mobile_number,$phone_number,$email,$instant_id,$family_unit,$uid,$connect);
+    $test_update_family=$update_family->update_address($firstname,$lastname,$dob,$gender,$street,$house_number,$zip_code,$city,$country,$mobile_number,$phone_number,$email,$instant_id,$family_unit,$uid,$connect,$fam);
 
 
 
@@ -215,7 +222,7 @@ if ($check_family_rep==true) {
 
 
         }
-
+}
 
         }
 

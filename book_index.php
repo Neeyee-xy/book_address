@@ -1,4 +1,5 @@
 <?php
+
 include('conn_book.php');
 $list_family_unit = new DB_con();
 if (isset($_GET['end'])) {
@@ -192,6 +193,45 @@ error: function(){
 
 
 
+//     $('form[name="update_address_book"]').on('submit',(function(e){
+// e.preventDefault();
+// $.ajax({
+// url: "pro_update_address_book.php",
+// type: "POST",
+// data:  new FormData(this),
+// contentType: false,
+// cache: false,
+// processData:false,
+// success: function(data){
+
+// $("#process2").hide();
+// $("#out2").html(data);
+//   $("#out2").show();
+//    $("#upload_csv_in").show();
+//   var input=$('#set').val();
+//   // alert(input);
+//  if (input=="success") {
+//   window.location.href="book_index.php"
+
+// }else if(input=="set1") {
+//   window.location.href="book_index.php"
+
+// }
+
+// },
+// error: function(){
+    
+//     $("#process2").hide();
+//      $("#upload_csv_in").show();
+//     alert('Connection Time Out:Network Error,Check Your Network Connection And Try Again..');
+// }           
+// });
+// }));
+
+
+
+
+
     $("#upload_csv_in_3").click(function(){
    $("#out3").hide();    
  $("#process3").show();
@@ -283,7 +323,89 @@ error: function(){
 });
 }));
 
+    $(document).on('click', ".update", function () {
 
+    var id = $(this).val(); // $(this) refers to button that was clicked
+  // alert(id);
+fetch_details(id) 
+
+    function fetch_details(id)  
+    {  
+// alert(resu);
+
+
+var que= id;
+
+
+var pass_data = {
+         'id' : id,
+         
+            
+        };
+        
+        $.ajax({
+            url : "update_address_book.php",  // create a new php page to handle ajax request
+            type : "POST",
+            data : pass_data,
+            success : function(data) {
+// alert(data);
+              $('#show_page').html(data);
+
+             $('#update_address').show();
+
+            }
+        });
+        
+    } 
+    return false;
+});
+
+
+
+
+
+$(document).on('click', ".upload_image", function () {
+
+    var id = $(this).val(); // $(this) refers to button that was clicked
+  // alert(id);
+fetch_details(id) 
+
+    function fetch_details(id)  
+    {  
+// alert(resu);
+
+
+var que= id;
+
+
+var pass_data = {
+         'id' : id,
+         
+            
+        };
+        
+        $.ajax({
+            url : "upload_image.php",  // create a new php page to handle ajax request
+            type : "POST",
+            data : pass_data,
+            success : function(data) {
+// alert(data);
+              $('#show_page').html(data);
+
+             $('#update_address').show();
+
+            }
+        });
+        
+    } 
+    return false;
+});
+
+
+
+// $(".update").click(function(){
+// alert("gg");
+//     });
  $("#add_product1").click(function(){
 $("#modal-xl_1").show();
     });
@@ -302,6 +424,7 @@ $("#modal-xl_1").show();
 
  $(".btn-right").click(function(){
   $(".modal").hide();
+
     });
 
 
@@ -336,16 +459,16 @@ $("#modal-xl_1").show();
         <!-- Info boxes -->
         <center><h4>Address Book List</h4></center>
         <hr>
-        
+        <div id="show_page"></div>
         <div class="row">
           <button type=submit id="add_product1" class=" btn btn-success" name="login" value=""  >
             Add  Address
           </button>
-          <input type=submit id="add_product2" class="btn btn-success" name="login" value="Upload CSV File(New Family Rep)" >
+         
 
-          <input type=submit id="add_product4" class="btn btn-success" name="login" value="Upload CSV File(Existing Family Rep )" >
+          <input type=submit id="add_product4" class="btn btn-success" name="login" value="Upload CSV File" >
 
-          <input type=submit id="add_product3" class="btn btn-success" name="login" value="Upload CSV File(Family Table)" >
+        
            <a class='link  btn-success' href='export_csv.php'>Download CSV File(Family Rep)</a>
             <a class='link  btn-success' href='export_csv_family.php'>Download CSV File(Family)</a>
             <a class='link  btn-success' href='print_layout.php' target="_blank" >View Print layout</a>
@@ -359,6 +482,7 @@ $("#modal-xl_1").show();
   <thead> 
   <tr>
   <th style='width:100px;'>Action </th>
+  <th>Image</th>
   <th>First name</th>
   <th>Last name</th>
   <th>Family Rep</th>
@@ -733,130 +857,13 @@ if ($family_results) {
 
 
 
-      <div class="modal fadeIn" id="modal-xl_2" >
-        <div class="modal-dialog fadeIn">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">Add Address(Family Rep)</h4>
-              <div id="accessg"></div>
-              <button type="button" class="btn btn-right " id="startexam" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true" id="closetab">Close</span>
-              </button>
-            </div>
-            <hr>
-            <form method="post" name="upload_csv">
-            <div class="modal-body">
-              <div class="card-body">
-                        <div class="row">
-                <div class="col-md-6 col-sm-12  ">
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">CSV File</label>
-                    <input type="File" class="form-control" id="exampleInputEmail1" name="import_csv" >
-                  </div>
-                </div>
-              
-</div>
-
-                  
-  <br>
-  <div class="col-md-12 col-sm-12 col-12 bg-warning">
-
-<div id="process2">
-  <img src="image/loader.gif" width="50px" height="50px">
-
-
-</div>
-  <div id="out2"></div>
-
-</div>
-<br>
-
-<input type=submit id="upload_csv_in" class="btn btn-success_submit" name="add_product" value="Add" style="width:100%;">
-
-
-       </div>
-
-                  </div>
-
-
-                 
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-             <!--  <button type="button" class="btn btn-outline-light" id="startexam" data-dismiss="modal">Close</button> -->
-             <!--  <button type="button" class="btn btn-outline-light">Save changes</button> -->
-            </div>
-          </div>
-          <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-      </div>
+      
 
 
 
 
 
 
-<div class="modal fadeIn" id="modal-xl_3" >
-        <div class="modal-dialog fadeIn">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">Add Address(Family Table)</h4>
-              <div id="accessg"></div>
-              <button type="button" class="btn btn-right " id="startexam" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true" id="closetab">Close</span>
-              </button>
-            </div>
-            <hr>
-            <form method="post" name="upload_csv_family">
-            <div class="modal-body">
-              <div class="card-body">
-                        <div class="row">
-                <div class="col-md-6 col-sm-12  ">
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">CSV File</label>
-                    <input type="File" class="form-control" id="exampleInputEmail1" name="import_csv_family" >
-                  </div>
-                </div>
-              
-</div>
-
-                  
-  <br>
-  <div class="col-md-12 col-sm-12 col-12 bg-warning">
-
-<div id="process3">
-  <img src="image/loader.gif" width="50px" height="50px">
-
-
-</div>
-  <div id="out3"></div>
-
-</div>
-<br>
-
-<input type=submit id="upload_csv_in_3" class="btn btn-success_submit" name="add_product" value="Add" style="width:100%;">
-
-
-       </div>
-
-                  </div>
-
-
-                 
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-             <!--  <button type="button" class="btn btn-outline-light" id="startexam" data-dismiss="modal">Close</button> -->
-             <!--  <button type="button" class="btn btn-outline-light">Save changes</button> -->
-            </div>
-          </div>
-          <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-      </div>
 
 
 
@@ -867,7 +874,7 @@ if ($family_results) {
         <div class="modal-dialog fadeIn">
           <div class="modal-content">
             <div class="modal-header">
-              <h4 class="modal-title">Add Address(Existing Family Rep)</h4>
+              <h4 class="modal-title">Upload CSV file</h4>
               <div id="accessg"></div>
               <button type="button" class="btn btn-right " id="startexam" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true" id="closetab">Close</span>
@@ -878,6 +885,18 @@ if ($family_results) {
             <div class="modal-body">
               <div class="card-body">
                         <div class="row">
+                           <div class="col-md-6 col-sm-12  ">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Select Purpose of the upload</label>
+                     <select class="form-control" id="exampleInputEmail1" name="purpose">
+                                      <option value="">---select purpose---</option>
+                                      <option value="Upload CSV File(New Family Rep)"> Upload CSV File(New Family Rep)</option>
+                                      <option value="Upload CSV File(Existing Family Rep )"> Upload CSV File(Existing Family Rep )</option>
+                                      <option value="Upload CSV File(Family Table)"> Upload CSV File(Family Table)</option>
+
+                                    </select>
+                  </div>
+                </div>
                 <div class="col-md-6 col-sm-12  ">
                   <div class="form-group">
                     <label for="exampleInputEmail1">CSV File</label>

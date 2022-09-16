@@ -12,6 +12,7 @@ $connect_first = new PDO("mysql:host=localhost;charset=utf8mb4", "root", "");
 					    }
 
 
+
 // setting set up a database automatcally
 // default datbase user is root, NO password 
 					    	$qry="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'address_book'";
@@ -82,6 +83,7 @@ $result_admin_table = $sta->fetchAll();
 	`family_id` varchar(255) DEFAULT null,														  
 	`family_rep` varchar(255) DEFAULT NULL,
 	`upload_set` varchar(255) DEFAULT NULL,
+	`pic` LONGTEXT  DEFAULT NULL,
 	`year` int(11) DEFAULT NULL,  PRIMARY KEY (`uid`)
 											)";
  $sta=$connect->prepare($qry);
@@ -246,7 +248,34 @@ $sta->execute();
 
 
 
- 
+ public function upload_image($name,$pic,$uid,$connect,$del_image)
+	{
+		$output="";
+$qry="SELECT * from book_sheet where uid=:uid";
+		$sta=$connect->prepare($qry);
+		 $sta->bindParam(":uid",$uid);
+      
+		$sta->execute();	
+		$result_name = $sta->fetchAll();
+		$count_name=count($result_name);
+		if ($count_name>0) {
+$qry = "UPDATE book_sheet  set pic=:pic where uid=:uid";
+  $sta=$connect->prepare($qry);
+$sta->bindParam(":uid",$uid);
+$sta->bindParam(":pic",$pic);
+$sta->execute();
+
+if ($del_image!=="") {
+	// code...
+	unlink($del_image);
+}
+$output="Okay";
+		}else{
+
+		}
+return $output;
+
+	}
 
 
   
@@ -339,7 +368,7 @@ public function upload_csv_existing_family_rep($firstname,$lastname,$dob,$gender
 		
 $family_name=$lastname." ".$firstname;
 
-
+// echo $uid."<br>";
 			$qry="INSERT INTO family (family_name,family_rep,email_rep) VALUES(:family_name,:family_rep,:email)";
 						$sta=$connect->prepare($qry);
 						 $sta->bindParam(":family_name",$family_name);
@@ -557,14 +586,21 @@ $result_family=$sta->fetchall();
 $count_trap_line=count($result_family);
 	
 foreach ($result_family as $row1) {
-
+if ($row1['pic']=="") {
+  $pic='image/male.png';
+}else{
+	 $pic=$row1['pic'];
+}
 
 	   echo  "<tr>
 <td> <div class='btn-group-horizontal'>
- <a class='link btn-success'style='display:inline-block;' href='update_address_book.php?otp=".$row1['uid']."'>Update</a>
+ <button class='link btn-success update'style='display:inline-block;' value='".$row1['uid']."'>Update</button>
+ <button class='link btn-success upload_image'style='display:inline-block;' value='".$row1['uid']."'>Add image</button>
   </div>
                       </td>
-
+<td><div class='img_wrapper_table'>
+<img src='".$pic."' class='img_table'>
+</div></td>
  <td>".$row1['firstname']."</td>
          <td>".$row1['lastname']."</td>
          <td>".$row['family_name']."</td>
@@ -598,15 +634,22 @@ $result_family1=$sta->fetchall();
 $count_trap_line=count($result_family);
 	
 foreach ($result_family1 as $row2) {
-
+if ($row2['pic']=="") {
+  $pic='image/male.png';
+}else{
+	 $pic=$row2['pic'];
+}
 	   echo  "<tr>
 <td> <div class='btn-group-horizontal'>
-                        <a class='link btn-success'style='display:inline-block;' href='update_address_book.php?otp=".$row2['uid']."'>Update</a>
+                         <button class='link btn-success update'style='display:inline-block;' value='".$row2['uid']."'>Update</button>
+                         <button class='link btn-success upload_image'style='display:inline-block;' value='".$row2['uid']."'>Add image</button>
 
                         <a class='link btn-success'style='display:inline-block;' href='pro_make_family_rep.php?otp=".$row2['uid']."'>Make Family Rep</a>
                       </div>
                       </td>
-
+<td><div class='img_wrapper_table'>
+<img src='".$pic."' class='img_table'>
+</div></td>
  <td>".$row2['firstname']."</td>
          <td>".$row2['lastname']."</td>
          <td>".$row['family_name']."</td>
@@ -647,18 +690,25 @@ $count_trap_line=count($result_family);
 
 foreach ($result_family as $row1) {
 
-
+if ($row1['pic']=="") {
+  $pic='image/male.png';
+}else{
+	 $pic=$row1['pic'];
+}
 	   echo  "<tr>
 <td> <div class='btn-group-horizontal'>
                             
                         
 
-                        <a class='link btn-success'style='display:inline-block;' href='update_address_book.php?otp=".$row1['uid']."'>Update</a>
+                        <button class='link btn-success update'style='display:inline-block;' value='".$row1['uid']."'>Update</button>
+                        <button class='link btn-success upload_image'style='display:inline-block;' value='".$row1['uid']."'>Add image</button>
 
                          
                       </div>
                       </td>
-
+<td><div class='img_wrapper_table'>
+<img src='".$pic."' class='img_table'>
+</div></td>
  <td>".$row1['firstname']."</td>
          <td>".$row1['lastname']."</td>
          <td>".$row['family_name']."</td>
@@ -747,7 +797,7 @@ public function list_address_book_print_layout($connect)
 	{
 
 
-
+       $pic="";
 $qry="SELECT * from book_sheet INNER JOIN family  where book_sheet.family_id=family.family_rep   ";
 $stat=$connect->prepare($qry);
 
@@ -762,15 +812,26 @@ $stat=$connect->prepare($qry);
 $stat->execute();
 $count_rep=$stat->rowCount();
 
+$brk_page=round($count_rep/12);
+$page_brk_holder=array();
+for ($i=1; $i <$brk_page ; $i++) { 
+	// code...
+	$page_brk_holder[]=12*$i;
+}
+
 if ($count_rep > 0) {
-	$no=0;
+  $no=0;
+  $no_brk=0;
+  $no_brk1=0;
+  $no_brk2=0;
   $resu=$stat->fetchall();
   foreach ($resu as $row) {
-  	
+    
+$no_brk++;
 
 
 
-  	$qry="SELECT * from book_sheet where family_id=:family_rep  order by dob DESC ";
+    $qry="SELECT * from book_sheet where family_id=:family_rep  order by dob DESC ";
 $sta=$connect->prepare($qry);
  $sta->bindParam(":family_rep",$row['family_rep']);
 $sta->execute();
@@ -778,15 +839,15 @@ $result_family=$sta->fetchall();
 $count_trap_line=count($result_family);
 $count_trap_lock=$count_trap_line-1;
 if ($count_trap_line>1) {
-	// code...
+  // code...
 
-	$qry="SELECT * from book_sheet where family_id=:family_rep  and uid=:family_rep order by dob ASC ";
+  $qry="SELECT * from book_sheet where family_id=:family_rep  and uid=:family_rep order by dob ASC ";
 $sta=$connect->prepare($qry);
  $sta->bindParam(":family_rep",$row['family_rep']);
 $sta->execute();
 $result_family=$sta->fetchall();
 $count_trap_line=count($result_family);
-	echo'<div class="content-wrapper">
+  echo' 
 
 
 
@@ -794,43 +855,52 @@ $count_trap_line=count($result_family);
 ';
 
 foreach ($result_family as $row1) {
-
-
 	
-		echo "
-<div  class='lay_out' >
-		<div class='other_row1'>
-<img src='image/pic.jpg' class='icon1' >
-		
-		
+	
+	
+ $no_brk=$no_brk+$count_trap_line;
+ 
+if($row1['pic']==""){
+$pic='image/male.png';
+}else{
+  $pic=$row1['pic'];
+}
 
-		
-		<div class='text_div'><h5>".$row1['lastname']." ".$row1['firstname']."
-					<br>
-					".$row1['dob']."</h5></div>
-					</div>
+  
+    echo "
+<div class='entry'>
+<div class='entry__column entry__column--person'>
+                <figure class='entry__image-box'>
+                  <img src='".$pic."' alt='Entry profile picture' class='entry__image'>
+                </figure>
+                <div class='entry__name-box'>
+                  <span class='text--3 text--bold line-height--2'>".$row1['lastname']." ".$row1['firstname']."</span>
+               
+                  <span class='text--2 line-height--1 gray'>".str_replace('-','.',$row1['dob'])."</span>
+                </div>
+              </div>
 
-					<div class='other_row1'>
+              <div class='entry__column entry__column--phone'>
+                <span class='entry__phone entry__phone--mobile text--2 line-height--3'>".$row1['phone_number']."</span><span class='entry__phone entry__phone--mobile text--2 line-height--3'>".$row1['mobile_number']."</span>
+               
+              </div>
 
-<img src='image/home.png' class='icon' ><div class='text_div'><h5> ".$row1['house_number'].",".$row1['street'].",".$row1['zip_code'].",".$row1['city'].",".$row1['country']."
-					</h5></div>
-					</div>
+              <div class='entry__column entry__column--mail'>
+                <span class='entry__email text--2 line-height--3'>".$row1['email']."</span>
+                <span class='entry__im text--2 line-height--3'>".$row1['instant_id']."</span>
+              </div>
+
+              <div class='entry__column entry__column--address'>
+                <p class='entry__address text--2 line-height--3'>
+                 ".$row1['house_number']."<br>".$row1['street']."<br>".$row1['zip_code']."<br>".$row1['city']."
+                </p>
+              </div>
+            </div>
+          
 
 
-					<div class='other_row1'>
-
-<img src='image/email.png' class='icon' ><div class='text_div'><h5> ".$row1['email']."
-					</h5></div>
-					</div>
-
-					<div class='other_row1'>
-
-<img src='image/messager.png' class='icon' ><div class='text_div'><h5> ".$row1['instant_id']."
-					</h5></div>
-					</div>
-</div>
-		";
-		
+    ";
+    
 
 
 $qry="SELECT * from book_sheet where family_id=:family_rep  and uid!=:family_rep order by dob ASC ";
@@ -839,122 +909,131 @@ $sta=$connect->prepare($qry);
 $sta->execute();
 $result_family1=$sta->fetchall();
 $count_trap_line=count($result_family);
-	echo'<div class="content-wrapper">
-
-
-
-
-';
+  
 
 foreach ($result_family1 as $row2) {
 // <h5>". $no .". &nbsp; &nbsp;".$row2['lastname']." ".$row2['firstname']."
-	$no++;
-	
-		echo "
-<div  class='lay_out' >
-		<div class='other_row1'>
-<img src='image/pic.jpg' class='icon1' >
-		
-		
-
-		
-		<div class='text_div'><h5>".$row2['lastname']." ".$row2['firstname']."
-					<br>
-					".$row2['dob']."</h5></div>
-					</div>
-
-					<div class='other_row1'>
-
-<img src='image/home.png' class='icon' ><div class='text_div'><h5> ".$row2['house_number'].",".$row2['street'].",".$row2['zip_code'].",".$row2['city'].",".$row2['country']."
-					</h5></div>
-					</div>
-
-
-					<div class='other_row1'>
-
-<img src='image/email.png' class='icon' ><div class='text_div'><h5> ".$row2['email']."
-					</h5></div>
-					</div>
-
-					<div class='other_row1'>
-
-<img src='image/messager.png' class='icon' ><div class='text_div'><h5> ".$row2['instant_id']."
-					</h5></div>
-					</div>
-</div>
-		";
-		if ($no==$count_trap_lock) {
-			echo"<hr>";
-			$no=0;
-		}
-
-}
-}
-
-		
-		
-
-	
+  $no++;
+  
+    if($row2['pic']==""){
+$pic='image/male.png';
 }else{
-	$qry="SELECT * from book_sheet where family_id=:family_rep  and uid=:family_rep order by dob ASC ";
+  $pic=$row2['pic'];
+}
+
+  $no_brk=$no_brk+$count_trap_line;
+    echo "
+<div class='entry'>
+<div class='entry__column entry__column--person'>
+                <figure class='entry__image-box'>
+                  <img src='".$pic."' alt='Entry profile picture' class='entry__image'>
+                </figure>
+                <div class='entry__name-box'>
+                  <span class='text--3 text--bold line-height--2'>".$row2['lastname']." ".$row2['firstname']."</span>
+               
+                  <span class='text--2 line-height--1 gray'>".str_replace('-','.',$row2['dob'])."</span>
+                </div>
+              </div>
+
+              <div class='entry__column entry__column--phone'>
+                <span class='entry__phone entry__phone--mobile text--2 line-height--3'>".$row2['phone_number']."</span>
+                <span class='entry__phone entry__phone--mobile text--2 line-height--3'>".$row2['mobile_number']."</span>
+                
+              </div>
+
+              <div class='entry__column entry__column--mail'>
+                <span class='entry__email text--2 line-height--3'>".$row2['email']."</span>
+                <span class='entry__im text--2 line-height--3'>".$row2['instant_id']."</span>
+              </div>
+
+              <div class='entry__column entry__column--address'>
+                <p class='entry__address text--2 line-height--3'>
+                 ".$row2['house_number']."<br>".$row2['street']."<br>".$row2['zip_code']."<br>".$row2['city']."
+                </p>
+              </div>
+            </div>
+           
+
+    ";
+    if ($no==$count_trap_lock) {
+      echo"<hr class='separator--x'>";
+      $no=0;
+    }
+
+}
+}
+
+    
+    
+
+  
+}else{
+  $qry="SELECT * from book_sheet where family_id=:family_rep  and uid=:family_rep order by dob ASC ";
 $sta=$connect->prepare($qry);
  $sta->bindParam(":family_rep",$row['family_rep']);
 $sta->execute();
 $result_family=$sta->fetchall();
 $count_trap_line=count($result_family);
-	echo'<div class="content-wrapper">
-
-
-
-
-';
+  
 
 foreach ($result_family as $row1) {
 
 // <h5>". $no .". &nbsp; &nbsp;".$row1['lastname']." ".$row1['firstname']."
-	$no++;
-	
-		echo "
-<div  class='lay_out' >
-		<div class='other_row1'>
-<img src='image/pic.jpg' class='icon1' >
-		
-		
+  $no++;
+  
+    if($row1['pic']==""){
+$pic='image/male.png';
+}else{
+  $pic=$row1['pic'];
+}
 
-		
-		<div class='text_div'><h5>".$row1['lastname']." ".$row1['firstname']."
-					<br>
-					".$row1['dob']."</h5></div>
-					</div>
+  
+    echo "
+<div class='entry'>
+<div class='entry__column entry__column--person'>
+                <figure class='entry__image-box'>
+                  <img src='".$pic."' alt='Entry profile picture' class='entry__image'>
+                </figure>
+                <div class='entry__name-box'>
+                  <span class='text--3 text--bold line-height--2'>".$row1['lastname']." ".$row1['firstname']."</span>
+               
+                  <span class='text--2 line-height--1 gray'>".str_replace('-','.',$row1['dob'])."</span>
+                </div>
+              </div>
 
-					<div class='other_row1'>
+              <div class='entry__column entry__column--phone'>
+                <span class='entry__phone entry__phone--mobile text--2 line-height--3'>".$row1['phone_number']."</span>
+                <span class='entry__phone entry__phone--mobile text--2 line-height--3'>".$row1['mobile_number']."</span>
+               
+              </div>
 
-<img src='image/home.png' class='icon' ><div class='text_div'><h5> ".$row1['house_number'].",".$row1['street'].",".$row1['zip_code'].",".$row1['city'].",".$row1['country']."
-					</h5></div>
-					</div>
+              <div class='entry__column entry__column--mail'>
+                <span class='entry__email text--2 line-height--3'>".$row1['email']."</span>
+                <span class='entry__im text--2 line-height--3'>".$row1['instant_id']."</span>
+              </div>
+
+              <div class='entry__column entry__column--address'>
+                <p class='entry__address text--2 line-height--3'>
+                 ".$row1['house_number']."<br>".$row1['street']."<br>".$row1['zip_code']."<br>".$row1['city']."
+                </p>
+              </div>
+            </div>
+           
 
 
-					<div class='other_row1'>
-
-<img src='image/email.png' class='icon' ><div class='text_div'><h5> ".$row1['email']."
-					</h5></div>
-					</div>
-
-					<div class='other_row1'>
-
-<img src='image/messager.png' class='icon' ><div class='text_div'><h5> ".$row1['instant_id']."
-					</h5></div>
-					</div>
-</div>
-		";
-		if ($no==$count_trap_line) {
-			echo"<hr>";
-			$no=0;
-		}
+    ";
+  
+    if ($no==$count_trap_line) {
+      echo"<hr class='separator--x'>";
+      $no=0;
+    }
 
 }
 }
-
+if (in_array($no_brk, $page_brk_holder)) {
+      echo"<div class='separator--x_brk'></div>";
+     
+    }
   }
 
   
@@ -1089,7 +1168,7 @@ return $result_name;
 
 // this update individual data
 
-		public function update_address($firstname,$lastname,$dob,$gender,$street,$house_number,$zip_code,$city,$country,$mobile_number,$phone_number,$email,$instant_id,$family_unit,$uid,$connect)
+		public function update_address($firstname,$lastname,$dob,$gender,$street,$house_number,$zip_code,$city,$country,$mobile_number,$phone_number,$email,$instant_id,$family_unit,$uid,$connect,$fam)
 	{
 			$qry="UPDATE book_sheet set firstname=:firstname,lastname=:lastname,dob=:dob,gender=:gender,street=:street,house_number=:house_number,zip_code=:zip_code,city=:city,country=:country,mobile_number=:mobile_number,phone_number=:phone_number,email=:email,instant_id=:instant_id where uid=:uid";
 		$sta=$connect->prepare($qry);
@@ -1108,6 +1187,21 @@ return $result_name;
                    $sta->bindParam(":instant_id",$instant_id);
                    $sta->bindParam(":uid",$uid);
                    if ($sta->execute()) {
+      //              	if ($family_unit==""and $fam=="NO") {
+      //              		$qry = "UPDATE book_sheet  set family_id=:family_id where uid=:id";
+
+					 //        $sta=$connect->prepare($qry);
+					 //         $sta->bindParam(":id",$last_id);
+					 //         $sta->bindParam(":family_id",$last_id);
+					 //         $sta->execute();
+      //              		// code...
+      // //              		$qry="INSERT INTO family (family_name,family_rep) VALUES(:family_name,:family_rep)";
+						// // $sta=$connect->prepare($qry);
+						// //  $sta->bindParam(":family_name",$family_name);
+				  // //        $sta->bindParam(":family_rep",$last_id);
+				  // //        $sta->execute();
+				  //        $output="Okay";
+      //              	}else{
                    	
                    	if ($family_unit=="Not Present") {
                    		$qry = "UPDATE book_sheet  set family_id=:family_id where uid=:id";
@@ -1148,7 +1242,7 @@ $stat->execute();
 $count=$stat->rowCount();
 // var_dump($uid);
 // die();
-if ($count > 0) {
+if ($count > 0 and $fam=="Yes") {
 $qry="DELETE from family where family_rep=:family_rep";
 
 					        $stat=$connect->prepare($qry);
@@ -1164,6 +1258,7 @@ $qry="DELETE from family where family_rep=:family_rep";
 
 
                    	}
+                   // }
 
 									                  }else{
 

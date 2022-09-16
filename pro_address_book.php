@@ -17,6 +17,7 @@ $insert_family = new DB_con();
              $response = array(
                 "type" => $insert_family->set_msg_type_and_msg('error'),
                 "message" => $insert_family->set_msg_type_and_msg('firstname is required ')
+             
                 );
 
     

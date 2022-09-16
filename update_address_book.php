@@ -1,11 +1,11 @@
 <?php
 include('conn_book.php');
 $list_individaul = new DB_con();
+if($_SERVER["REQUEST_METHOD"]=="POST"){
 
 
-  if (isset($_GET['otp'])) {
 
-$uid=clean($_GET['otp']);
+$uid=clean($_POST['id']);
 $result_family=$list_individaul->list_individual_data($uid,$connect);
 foreach ($result_family  as $row) {
   $firstname1=$row['firstname'];
@@ -63,7 +63,10 @@ foreach ($result_family  as $row) {
 
 $(document).ready(function(){
 
-
+$(".btn-right").click(function(){
+  $(".modal").hide();
+  
+    });
 $("#fam").change(function(){
    var fam_input=$("#fam").val();
    if (fam_input=="Yes") {
@@ -85,17 +88,48 @@ $("#fam").change(function(){
 
 
 $("#add_product").click(function(){
-   $("#out1").hide();    
- $("#process").show();
+   $("#out1_update").hide();    
+ $("#process_update").show();
   $("#add_product").hide();
 
 
        });
 
 
-var cid=<?php  echo json_encode($uid);?>;
+var id=<?php  echo json_encode($uid);?>;
 
-    $("form").on('submit',(function(e){
+// fetch_details(id) its going to break
+
+    function fetch_details(id)  
+    {  
+// alert(resu);
+
+
+var que= id;
+
+
+var pass_data = {
+         'id' : id,
+         
+            
+        };
+        
+        $.ajax({
+            url : "update_address_book.php",  // create a new php page to handle ajax request
+            type : "POST",
+            data : pass_data,
+            success : function(data) {
+// alert(data);
+              $('#show_page').html(data);
+
+             $('#update_address').show();
+
+            }
+        });
+        
+    }
+
+   $('form[name="update_address_book"]').on('submit',(function(e){
 e.preventDefault();
 $.ajax({
 url: "pro_update_address_book.php",
@@ -106,44 +140,44 @@ cache: false,
 processData:false,
 success: function(data){
 
-$("#process").hide();
-$("#out1").html(data);
-  $("#out1").show();
+$("#process_update").hide();
+$("#out1_update").html(data);
+  $("#out1_update").show();
    $("#add_product").show();
   var input=$('#set').val();
   // alert(data);
- if (input=="set") {
-  window.location.href="update_address_book.php?otp="+cid
+ // if (input=="set") {
+if (input=="success") {
+  window.location.href="book_index.php"
+
+// } 
 
 }
 
 },
 error: function(){
     
-    $("#process").hide();
+    $("#process_update").hide();
      $("#add_product").show();
     alert('Connection Time Out:Network Error,Check Your Network Connection And Try Again..');
 }           
 });
 }));
- $("#add_product1").click(function(){
- $('#modal-xl').modal({ show: true });
-    });
+
   
   });
+
 </script>
 
 <script>
 var gender1=<?php  echo json_encode($gender);?>;
-function gender() {
-
-  document.getElementById('gender').value=gender1;
-}
 var family_unit1=<?php  echo json_encode($family_unit);?>;
-function family_unit() {
 
-  document.getElementById('family_unit').value=family_unit1;
-}
+$("#gender").val(gender1);
+
+$("#family_unit").val(family_unit1);
+
+
 
 
 
@@ -154,11 +188,11 @@ function family_unit() {
 #family_form{
     display: none;
   } 
-#process{
+#process_update{
     display: none;
 
    }
-#out1{
+#out1_update{
   display: none;
 }
 .responsive_img {
@@ -169,11 +203,8 @@ function family_unit() {
 
 </style>
  
-<body  onload="gender(), family_unit()">
-<div class="header">
-   <li ><a href="book_index.php">Home</a></li>
-              
-</div>
+<body  >
+
 
   <!-- Navbar -->
 
@@ -188,9 +219,7 @@ function family_unit() {
     <section class="content">
       <div class="container-fluid">
         <!-- Info boxes -->
-        <center><h4> Update Address Book:<?php echo $firstname1." ".$lastname1;  ?> </h4></center>
-        <hr>
-        <a href="book_index.php" class="btn btn-success" style="width: 20%"> Back To Address Book</a>
+        
         <div class="row">
   
 
@@ -202,12 +231,21 @@ function family_unit() {
 
 
 
-
-
-
-
-<div class="content-wrapper">
-            <form method="post">
+<div class="modal fadeIn" id="update_address" >
+        <div class="modal-dialog fadeIn">
+          <div class="modal-content">
+            <div class="modal-header">
+              <!-- <h4 class="modal-title">Update Address</h4> -->
+              <h4> Update Address Book: <?php echo $firstname1." ".$lastname1;  ?> </h4>
+       
+       
+              <div id="accessg"></div>
+              <button type="button" class="btn btn-right " id="startexam" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true" id="closetab">Close</span>
+              </button>
+            </div>
+            <hr>
+             <form method="post" name="update_address_book">
             <div class="modal-body">
               <div class="card-body">
                         <div class="row">
@@ -356,6 +394,7 @@ function family_unit() {
                   </div>
                 </div>
 
+
                   <div class="col-md-6 col-sm-12  ">
                   
                   <div class="form-group" >
@@ -414,12 +453,12 @@ if ($family_results) {
   <br>
   <div class=" bg-warning">
 
-<div id="process">
+<div id="process_update">
   <img src="image/loader.gif" width="50px" height="50px">
 
 
 </div>
-  <div id="out1"></div>
+  <div id="out1_update"></div>
 
 </div>
 <br>
@@ -432,18 +471,26 @@ if ($family_results) {
                   </div>
 
 
-                 
+                 </form>
                 </div>
-              </form>
+              
             
-    
+            
+            <div class="modal-footer justify-content-between">
+             <!--  <button type="button" class="btn btn-outline-light" id="startexam" data-dismiss="modal">Close</button> -->
+             <!--  <button type="button" class="btn btn-outline-light">Save changes</button> -->
             </div>
-            
           </div>
           <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
-     
+
+
+
+
+
+            
+       
 
 
 
@@ -464,15 +511,7 @@ if ($family_results) {
 
 ?>
          
-          </div>
-          <!-- /.col -->
-        </div>
-        <!-- /.row -->
-
-        <!-- Main row -->
-  
-    </section>
-  </div>
+          
     <!-- /.content -->
   <!-- /.content-wrapper -->
 
@@ -481,10 +520,8 @@ if ($family_results) {
   <!-- /.control-sidebar -->
 
   <!-- Main Footer -->
-  <?php
-include('footer.php');
-  ?>
-</div>
+ 
+
 
 <!-- ./wrapper -->
 

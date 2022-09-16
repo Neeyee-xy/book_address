@@ -408,7 +408,7 @@ text-align:left;
 
   
 .table_wrapper{
-width: auto;
+max-width: 1300px;
   overflow-x: scroll;
   margin-bottom: 10px;
 }
@@ -526,3 +526,34 @@ width: 980px;
 }
 
 
+#update_address{
+  display: none;
+}
+
+#pic{
+  border:1px;
+  background-size:100px 100px ;
+  /*height: 100px !important;*/
+  width: 100px ;
+  height: 100px;
+  background-repeat: no-repeat;
+ 
+  color: black;
+  border-radius: 10px;
+
+ 
+}
+#pic_label {
+  width: 100px;
+  height: 100px;
+
+margin-bottom: 10px;
+}
+.img_wrapper_table{
+  height: 100px;
+/*  width: 100px;*/
+}
+.img_table{
+  height: 100%;
+  width: auto;
+}
