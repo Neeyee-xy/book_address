@@ -892,7 +892,7 @@ $pic='image/male.png';
 
               <div class='entry__column entry__column--address'>
                 <p class='entry__address text--2 line-height--3'>
-                 ".$row1['house_number']."<br>".$row1['street']."<br>".$row1['zip_code']."<br>".$row1['city']."
+                 ".$row1['house_number']." ".$row1['street']."<br>".$row1['zip_code'].",  ".$row1['city']."
                 </p>
               </div>
             </div>
@@ -948,7 +948,7 @@ $pic='image/male.png';
 
               <div class='entry__column entry__column--address'>
                 <p class='entry__address text--2 line-height--3'>
-                 ".$row2['house_number']."<br>".$row2['street']."<br>".$row2['zip_code']."<br>".$row2['city']."
+                 ".$row2['house_number']." ".$row2['street']."<br>".$row2['zip_code'].",  ".$row2['city']."
                 </p>
               </div>
             </div>
@@ -1014,7 +1014,7 @@ $pic='image/male.png';
 
               <div class='entry__column entry__column--address'>
                 <p class='entry__address text--2 line-height--3'>
-                 ".$row1['house_number']."<br>".$row1['street']."<br>".$row1['zip_code']."<br>".$row1['city']."
+                 ".$row1['house_number']." ".$row1['street']."<br>".$row1['zip_code'].",  ".$row1['city']."
                 </p>
               </div>
             </div>
